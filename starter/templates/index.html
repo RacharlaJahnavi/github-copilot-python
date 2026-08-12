@@ -1,18 +1,159 @@
 <!doctype html>
-<html>
+<html lang="en">
+
 <head>
-  <meta charset="utf-8">
-  <title>Sudoku Game</title>
-  <link rel="stylesheet" href="/static/styles.css">
+    <meta charset="utf-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>Sudoku Game</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
 </head>
+
 <body>
-  <h1>Sudoku Game</h1>
-  <div id="sudoku-board"></div>
-  <div class="controls">
-    <button id="new-game">New Game</button>
-    <button id="check-solution">Check Solution</button>
-    <span id="message"></span>
-  </div>
-  <script src="/static/main.js"></script>
+
+    <main class="container">
+
+        <h1>Sudoku Game</h1>
+
+        <!-- Player and Difficulty -->
+        <div class="game-options">
+
+            <label for="player-name">
+                Player Name:
+            </label>
+
+            <input
+                type="text"
+                id="player-name"
+                placeholder="Enter your name"
+            >
+
+
+            <label for="difficulty">
+                Difficulty:
+            </label>
+
+            <select id="difficulty">
+
+                <option value="easy">
+                    Easy
+                </option>
+
+                <option value="medium" selected>
+                    Medium
+                </option>
+
+                <option value="hard">
+                    Hard
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- Timer -->
+        <div class="timer-container">
+
+            <span>Time:</span>
+
+            <span id="timer">
+                00:00
+            </span>
+
+        </div>
+
+
+        <!-- Sudoku Board -->
+        <div id="sudoku-board">
+        </div>
+
+
+        <!-- Controls -->
+        <div class="controls">
+
+            <button id="new-game">
+                New Game
+            </button>
+
+            <button id="check-solution">
+                Check Solution
+            </button>
+
+            <button id="hint">
+                Hint
+            </button>
+
+            <button id="dark-mode">
+                🌙 Dark Mode
+            </button>
+
+        </div>
+
+
+        <!-- Message -->
+        <div id="message">
+        </div>
+
+
+        <!-- Top 10 Scoreboard -->
+        <section class="scoreboard">
+
+            <h2>
+                🏆 Top 10 Scores
+            </h2>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Rank
+                            </th>
+
+                            <th>
+                                Name
+                            </th>
+
+                            <th>
+                                Time
+                            </th>
+
+                            <th>
+                                Difficulty
+                            </th>
+
+                            <th>
+                                Hints
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="scoreboard-body">
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="{{ url_for('static', filename='main.js') }}">
+    </script>
+
 </body>
+
 </html>
