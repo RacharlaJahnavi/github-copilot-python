@@ -714,6 +714,8 @@ function toggleDarkMode() {
             .contains("dark-mode")
     ) {
 
+        button.setAttribute("aria-pressed", "true");
+
         button.innerText =
             "☀️ Light Mode";
 
@@ -724,6 +726,8 @@ function toggleDarkMode() {
         );
 
     } else {
+
+        button.setAttribute("aria-pressed", "false");
 
         button.innerText =
             "🌙 Dark Mode";
@@ -759,6 +763,8 @@ function loadDarkMode() {
             "dark-mode"
         );
 
+
+        button.setAttribute("aria-pressed", "true");
 
         button.innerText =
             "☀️ Light Mode";
