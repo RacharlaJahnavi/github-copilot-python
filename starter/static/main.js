@@ -120,12 +120,16 @@ function createBoardElement() {
                 "input",
                 function (event) {
 
-                    event.target.value =
+                    const input = event.target;
+
+                    input.value =
                         event.target.value
                             .replace(/[^1-9]/g, "");
 
-                    event.target.classList
+                    input.classList
                         .remove("incorrect");
+
+                    validateCell(input);
                 }
             );
 
@@ -135,6 +139,56 @@ function createBoardElement() {
 
 
         boardDiv.appendChild(rowDiv);
+    }
+}
+
+
+async function validateCell(input) {
+
+    if (input.disabled || input.value === "") {
+        return;
+    }
+
+    const enteredValue = input.value;
+    const inputs =
+        document
+            .getElementById("sudoku-board")
+            .getElementsByTagName("input");
+    const board = [];
+
+    for (let i = 0; i < SIZE; i++) {
+        board[i] = [];
+
+        for (let j = 0; j < SIZE; j++) {
+            const value = inputs[i * SIZE + j].value;
+            board[i][j] = value === "" ? 0 : parseInt(value, 10);
+        }
+    }
+
+    try {
+        const response = await fetch("/check", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({board: board})
+        });
+        const data = await response.json();
+
+        if (input.value !== enteredValue || input.disabled) {
+            return;
+        }
+
+        const isIncorrect = data.incorrect && data.incorrect.some(
+            function (position) {
+                return position[0] === Number(input.dataset.row) &&
+                    position[1] === Number(input.dataset.col);
+            }
+        );
+
+        input.classList.toggle("incorrect", isIncorrect);
+    } catch (error) {
+        console.error(error);
     }
 }
 

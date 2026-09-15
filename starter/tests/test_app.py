@@ -175,6 +175,23 @@ def test_check_reports_incomplete_board(client):
     }
 
 
+def test_check_does_not_mark_correct_editable_value_incorrect(client):
+    app_module.current_puzzle = [row[:] for row in PUZZLE]
+    app_module.current_solution = [row[:] for row in SOLUTION]
+    board = [row[:] for row in PUZZLE]
+    board[0][1] = SOLUTION[0][1]
+
+    response = client.post("/check", json={"board": board})
+
+    assert response.status_code == 200
+    assert response.get_json() == {
+        "incorrect": [],
+        "incomplete": [],
+        "complete": True,
+        "message": "Congratulations! You solved it!",
+    }
+
+
 def test_check_reports_incorrect_values(client):
     app_module.current_puzzle = [row[:] for row in PUZZLE]
     app_module.current_solution = [row[:] for row in SOLUTION]
