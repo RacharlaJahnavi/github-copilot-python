@@ -5,6 +5,8 @@ let puzzle = [];
 
 let timerInterval = null;
 
+let timerStartTime = null;
+
 let elapsedSeconds = 0;
 
 let hintsUsed = 0;
@@ -19,6 +21,8 @@ let gameCompleted = false;
 function startTimer() {
 
     stopTimer();
+
+    timerStartTime = Date.now();
 
     elapsedSeconds = 0;
 
@@ -36,16 +40,30 @@ function startTimer() {
 
 function stopTimer() {
 
+    if (timerStartTime !== null) {
+        elapsedSeconds = Math.floor(
+            (Date.now() - timerStartTime) / 1000
+        );
+    }
+
     if (timerInterval !== null) {
 
         clearInterval(timerInterval);
 
         timerInterval = null;
     }
+
+    timerStartTime = null;
 }
 
 
 function updateTimerDisplay() {
+
+    if (timerStartTime !== null) {
+        elapsedSeconds = Math.floor(
+            (Date.now() - timerStartTime) / 1000
+        );
+    }
 
     const minutes =
         Math.floor(elapsedSeconds / 60);
@@ -180,6 +198,8 @@ function renderPuzzle(puz) {
 // =========================================
 
 async function newGame() {
+
+    stopTimer();
 
     try {
 
