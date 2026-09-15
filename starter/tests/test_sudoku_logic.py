@@ -1,3 +1,4 @@
+import pytest
 import sudoku_logic
 
 
@@ -63,6 +64,18 @@ def test_count_solutions_counts_solved_and_ambiguous_boards():
 
     assert sudoku_logic.count_solutions(solved_board) == 1
     assert sudoku_logic.count_solutions(ambiguous_board, max_solutions=2) == 2
+
+
+def test_count_solutions_rejects_invalid_givens():
+    invalid_board = sudoku_logic.deep_copy(SOLVED_BOARD)
+    invalid_board[0][1] = invalid_board[0][0]
+
+    assert sudoku_logic.count_solutions(invalid_board) == 0
+
+
+def test_generate_puzzle_rejects_unsupported_clue_count():
+    with pytest.raises(ValueError):
+        sudoku_logic.generate_puzzle(clues=16)
 
 
 def test_remove_cells_keeps_requested_clues_and_unique_solution():
