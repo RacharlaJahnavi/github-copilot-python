@@ -18,7 +18,7 @@ body {
     width: 100%;
     max-width: 900px;
     margin: 0 auto;
-    padding: 20px;
+    padding: clamp(12px, 3vw, 20px);
 }
 
 h1 {
@@ -74,7 +74,8 @@ h2 {
    ========================================= */
 
 #sudoku-board {
-    width: min(90vw, 540px);
+    width: min(100%, 540px);
+    max-width: 540px;
     aspect-ratio: 1 / 1;
     margin: 0 auto 20px;
 
@@ -102,7 +103,7 @@ h2 {
 
     text-align: center;
 
-    font-size: clamp(18px, 4vw, 28px);
+    font-size: clamp(16px, 4vw, 28px);
 
     border: 1px solid #aaa;
 
@@ -110,6 +111,13 @@ h2 {
     color: #222;
 
     outline: none;
+}
+
+.sudoku-cell:focus-visible {
+    position: relative;
+    z-index: 1;
+    outline: 3px solid #1565c0;
+    outline-offset: -3px;
 }
 
 
@@ -279,7 +287,8 @@ h2 {
     align-items: center;
     flex-wrap: wrap;
     gap: 10px;
-    margin: 20px 0;
+    max-width: 700px;
+    margin: 20px auto;
 }
 
 button {
@@ -530,20 +539,33 @@ body.dark-mode td {
     }
 
     .controls {
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     button {
         width: 100%;
+        min-height: 44px;
     }
 
     .sudoku-cell {
-        font-size: 18px;
+        font-size: clamp(16px, 6vw, 24px);
     }
 
     th,
     td {
         padding: 7px;
         font-size: 13px;
+    }
+}
+
+@media (max-width: 360px) {
+
+    .controls {
+        grid-template-columns: 1fr;
+    }
+
+    .sudoku-cell {
+        font-size: 16px;
     }
 }
