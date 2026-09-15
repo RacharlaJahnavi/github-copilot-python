@@ -228,3 +228,21 @@ def test_check_accepts_string_numbers_and_complete_solution(client):
         "complete": True,
         "message": "Congratulations! You solved it!",
     }
+
+
+def test_check_completes_after_hint_fills_last_empty_cell(client):
+    app_module.current_puzzle = [row[:] for row in PUZZLE]
+    app_module.current_solution = [row[:] for row in SOLUTION]
+
+    hint_response = client.get("/hint")
+    completed_board = [row[:] for row in app_module.current_puzzle]
+    response = client.post("/check", json={"board": completed_board})
+
+    assert hint_response.get_json() == {"row": 0, "col": 1, "value": 3}
+    assert response.status_code == 200
+    assert response.get_json() == {
+        "incorrect": [],
+        "incomplete": [],
+        "complete": True,
+        "message": "Congratulations! You solved it!",
+    }
