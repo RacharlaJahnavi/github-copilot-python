@@ -76,6 +76,15 @@ def check_solution():
 
     board = data["board"]
 
+    if (
+        not isinstance(board, list)
+        or len(board) != 9
+        or any(not isinstance(row, list) or len(row) != 9 for row in board)
+    ):
+        return jsonify({
+            "error": "Invalid board data."
+        }), 400
+
     if current_puzzle is None or current_solution is None:
         return jsonify({
             "error": "Please start a new game first."

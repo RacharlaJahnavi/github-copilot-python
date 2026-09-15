@@ -143,6 +143,16 @@ def test_check_rejects_missing_board(client):
     assert response.get_json() == {"error": "Invalid board data."}
 
 
+def test_check_rejects_malformed_board_shape(client):
+    app_module.current_puzzle = [row[:] for row in PUZZLE]
+    app_module.current_solution = [row[:] for row in SOLUTION]
+
+    response = client.post("/check", json={"board": []})
+
+    assert response.status_code == 400
+    assert response.get_json() == {"error": "Invalid board data."}
+
+
 def test_check_requires_a_started_game(client):
     response = client.post("/check", json={"board": PUZZLE})
 
@@ -176,6 +186,28 @@ def test_check_reports_incorrect_values(client):
     assert response.status_code == 200
     assert response.get_json() == {
         "incorrect": [[0, 1]],
+        "incomplete": [],
+        "complete": False,
+        "message": "Some cells are incorrect.",
+    }
+
+
+def test_check_reports_multiple_incorrect_editable_values_without_flagging_clues(
+    client,
+):
+    app_module.current_puzzle = [row[:] for row in PUZZLE]
+    app_module.current_puzzle[1][1] = 0
+    app_module.current_solution = [row[:] for row in SOLUTION]
+    board = [row[:] for row in SOLUTION]
+    board[0][1] = 9
+    board[1][1] = 8
+    board[0][0] = 9
+
+    response = client.post("/check", json={"board": board})
+
+    assert response.status_code == 200
+    assert response.get_json() == {
+        "incorrect": [[0, 1], [1, 1]],
         "incomplete": [],
         "complete": False,
         "message": "Some cells are incorrect.",
