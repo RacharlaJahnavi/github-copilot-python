@@ -1,3 +1,4 @@
+import pytest
 import app as app_module
 
 
@@ -41,7 +42,13 @@ def test_home_renders_game_page(client):
     assert b"Sudoku Game" in response.data
 
 
-def test_new_game_uses_requested_difficulty_and_clue_count(client, monkeypatch):
+@pytest.mark.parametrize(
+    ("difficulty", "expected_clues"),
+    [("easy", 45), ("medium", 35), ("hard", 25)],
+)
+def test_new_game_uses_requested_difficulty_and_clue_count(
+    client, monkeypatch, difficulty, expected_clues
+):
     calls = []
 
     def fake_generate_puzzle(clues):
@@ -50,11 +57,11 @@ def test_new_game_uses_requested_difficulty_and_clue_count(client, monkeypatch):
 
     monkeypatch.setattr(app_module, "generate_puzzle", fake_generate_puzzle)
 
-    response = client.get("/new?difficulty=hard")
+    response = client.get(f"/new?difficulty={difficulty}")
 
     assert response.status_code == 200
-    assert response.get_json() == {"puzzle": PUZZLE, "difficulty": "hard"}
-    assert calls == [25]
+    assert response.get_json() == {"puzzle": PUZZLE, "difficulty": difficulty}
+    assert calls == [expected_clues]
 
 
 def test_new_game_defaults_unknown_difficulty_to_medium_clues(client, monkeypatch):

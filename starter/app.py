@@ -6,6 +6,12 @@ app = Flask(__name__)
 current_puzzle = None
 current_solution = None
 
+DIFFICULTY_CLUES = {
+    "easy": 45,
+    "medium": 35,
+    "hard": 25,
+}
+
 
 @app.route("/")
 def home():
@@ -18,13 +24,7 @@ def new_game():
 
     difficulty = request.args.get("difficulty", "medium")
 
-    difficulty_clues = {
-        "easy": 45,
-        "medium": 35,
-        "hard": 25
-    }
-
-    clues = difficulty_clues.get(difficulty, 35)
+    clues = DIFFICULTY_CLUES.get(difficulty, DIFFICULTY_CLUES["medium"])
 
     current_puzzle, current_solution = generate_puzzle(clues)
 
