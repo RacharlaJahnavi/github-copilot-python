@@ -89,12 +89,41 @@ def test_hint_requires_a_started_game(client):
 def test_hint_fills_first_empty_cell(client, monkeypatch):
     start_fixed_game(monkeypatch)
     client.get("/new")
+    before_hint = [row[:] for row in app_module.current_puzzle]
 
     response = client.get("/hint")
 
     assert response.status_code == 200
     assert response.get_json() == {"row": 0, "col": 1, "value": 3}
     assert app_module.current_puzzle[0][1] == 3
+    assert app_module.current_puzzle[0][1] == app_module.current_solution[0][1]
+    changed_cells = [
+        (row, col)
+        for row in range(9)
+        for col in range(9)
+        if before_hint[row][col] != app_module.current_puzzle[row][col]
+    ]
+    assert changed_cells == [(0, 1)]
+
+
+def test_hint_fills_one_new_cell_on_each_request(client, monkeypatch):
+    start_fixed_game(monkeypatch)
+    client.get("/new")
+    app_module.current_puzzle[1][1] = 0
+
+    first_hint = client.get("/hint").get_json()
+    second_hint = client.get("/hint").get_json()
+
+    assert (first_hint["row"], first_hint["col"]) != (
+        second_hint["row"],
+        second_hint["col"],
+    )
+    assert first_hint["value"] == app_module.current_solution[
+        first_hint["row"]
+    ][first_hint["col"]]
+    assert second_hint["value"] == app_module.current_solution[
+        second_hint["row"]
+    ][second_hint["col"]]
 
 
 def test_hint_reports_when_no_empty_cells_remain(client):
