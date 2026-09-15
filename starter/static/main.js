@@ -1,4 +1,5 @@
 const SIZE = 9;
+const SCORE_STORAGE_KEY = "sudokuScores";
 
 let puzzle = [];
 
@@ -7,6 +8,8 @@ let timerInterval = null;
 let elapsedSeconds = 0;
 
 let hintsUsed = 0;
+
+let gameCompleted = false;
 
 
 // =========================================
@@ -201,6 +204,8 @@ async function newGame() {
 
         hintsUsed = 0;
 
+        gameCompleted = false;
+
 
         document
             .getElementById("message")
@@ -342,10 +347,17 @@ async function checkSolution() {
                 "#388e3c";
 
             message.innerText =
-                "Congratulations! You solved it!";
+                "Congratulations! You solved it in " +
+                formatScoreTime(elapsedSeconds) +
+                " with " +
+                hintsUsed +
+                (hintsUsed === 1 ? " hint." : " hints.");
 
 
-            saveScore();
+            if (!gameCompleted) {
+                saveScore();
+                gameCompleted = true;
+            }
 
             return;
         }
@@ -470,6 +482,65 @@ async function useHint() {
 // SCOREBOARD
 // =========================================
 
+function loadScores() {
+
+    try {
+
+        const storedScores =
+            JSON.parse(
+                localStorage.getItem(SCORE_STORAGE_KEY)
+            );
+
+
+        if (!Array.isArray(storedScores)) {
+            return [];
+        }
+
+
+        return storedScores.filter(function (score) {
+
+            return score &&
+                typeof score.name === "string" &&
+                Number.isFinite(score.time) &&
+                score.time >= 0 &&
+                typeof score.difficulty === "string" &&
+                Number.isFinite(score.hints) &&
+                score.hints >= 0;
+        });
+
+    } catch (error) {
+
+        console.error(error);
+        return [];
+    }
+}
+
+
+function saveScores(scores) {
+
+    scores.sort(function (a, b) {
+
+        return a.time - b.time;
+    });
+
+
+    scores = scores.slice(0, 10);
+
+
+    try {
+
+        localStorage.setItem(
+            SCORE_STORAGE_KEY,
+            JSON.stringify(scores)
+        );
+
+    } catch (error) {
+
+        console.error(error);
+    }
+}
+
+
 function saveScore() {
 
     let playerName =
@@ -503,31 +574,13 @@ function saveScore() {
     };
 
 
-    let scores =
-        JSON.parse(
-            localStorage.getItem(
-                "sudokuScores"
-            )
-        ) || [];
+    const scores = loadScores();
 
 
     scores.push(score);
 
 
-    scores.sort(function (a, b) {
-
-        return a.time - b.time;
-    });
-
-
-    scores =
-        scores.slice(0, 10);
-
-
-    localStorage.setItem(
-        "sudokuScores",
-        JSON.stringify(scores)
-    );
+    saveScores(scores);
 
 
     displayScores();
@@ -554,12 +607,7 @@ function displayScores() {
     tbody.innerHTML = "";
 
 
-    let scores =
-        JSON.parse(
-            localStorage.getItem(
-                "sudokuScores"
-            )
-        ) || [];
+    const scores = loadScores();
 
 
     scores.forEach(function (score, index) {
@@ -568,14 +616,23 @@ function displayScores() {
             document.createElement("tr");
 
 
-        row.innerHTML =
-            `
-            <td>${index + 1}</td>
-            <td>${score.name}</td>
-            <td>${formatScoreTime(score.time)}</td>
-            <td>${capitalize(score.difficulty)}</td>
-            <td>${score.hints}</td>
-            `;
+        const values = [
+            index + 1,
+            score.name,
+            formatScoreTime(score.time),
+            capitalize(score.difficulty),
+            score.hints,
+        ];
+
+
+        values.forEach(function (value) {
+
+            const cell =
+                document.createElement("td");
+
+            cell.textContent = value;
+            row.appendChild(cell);
+        });
 
 
         tbody.appendChild(row);
